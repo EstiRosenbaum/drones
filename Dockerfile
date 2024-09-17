@@ -9,7 +9,6 @@ FROM python:3.12.2
 WORKDIR /app
 
 COPY ./ /app
-
 RUN mkdir /usr/share/filebeat
 
 RUN touch /usr/share/filebeat/app.log
