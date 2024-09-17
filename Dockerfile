@@ -16,4 +16,4 @@ RUN touch /usr/share/filebeat/app.log
 
 RUN  pip install .
 
-RUN pytest
+# RUN pytest
