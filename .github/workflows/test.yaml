@@ -21,6 +21,4 @@ jobs:
 
       - name: ✅ Run tests
         run: |
-          docker build -t testing .
-          docker run testing
-          pytest .
+          docker build -t testing -f Dockerfile.test .
