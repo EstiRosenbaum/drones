@@ -1,0 +1,24 @@
+name: 🧪 Test
+
+on:
+  push:
+
+jobs:
+  test:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📂 Checkout
+        uses: actions/checkout@v3
+
+      - name: 🐍 Set up Python 3.11
+        uses: actions/setup-python@v3
+
+      - name: ⏬ Install dependencies
+        run: |
+          pip install .
+
+      - name: ✅ Run tests
+        run: |
+          docker build -t testing .

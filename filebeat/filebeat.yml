@@ -1,0 +1,22 @@
+filebeat.inputs:
+  - type: filestream
+    enabled: true
+    paths:
+      - /usr/share/filebeat/app.log
+
+processors:
+  - dissect:
+      tokenizer: "%{timestamp} [%{log_level}] %{message}"
+
+  - drop_fields:
+      fields: ["message"]
+
+setup.ilm.enabled: false
+setup.template.name: "${ELASTICSEARCH_INDEX}"
+setup.template.pattern: "${ELASTICSEARCH_INDEX}-*"
+
+output.elasticsearch:
+  hosts: ["${ELASTICSEARCH_HOST}"]
+  username: "${ELASTICSEARCH_USERNAME:elastic}"
+  password: "Drones!!"
+  index: "${ELASTICSEARCH_INDEX}"

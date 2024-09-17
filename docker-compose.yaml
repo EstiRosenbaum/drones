@@ -1,0 +1,88 @@
+services:
+    # rabbitmq:
+    #     image: rabbitmq:3.12-management
+    #     container_name: rabbitmq
+    #     networks:
+    #         - drones
+    #     ports:
+    #         - "15672:15672"
+    #         - "5672:5672"
+    #     volumes:
+    #         - rabbit:/rabbit
+
+    # redis:
+    #     image: redis/redis-stack:7.4.0-v0
+    #     container_name: redis
+    #     networks:
+    #         - drones
+    #     volumes:
+    #         - redis:/redis
+
+    # python:
+    #     build:
+    #         dockerfile: Dockerfile
+    #     container_name: python
+    #     depends_on:
+    #         - rabbitmq
+    #     networks:
+    #         - drones
+    #     env_file:
+    #         - env/.env.elastic
+    #     entrypoint: ["/bin/bash", "/app/${PROJECT_NAME}/initialize.sh"]
+    #     volumes:
+    #         - python:/python
+    #         - ${LOG_FILE_PATH}:/usr/share/filebeat/app.log
+
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+        container_name: elasticsearch
+        environment:
+            - discovery.type=single-node
+        ports:
+            - "9200:9200"
+        networks:
+            - drones
+
+    kibana:
+        image: docker.elastic.co/kibana/kibana:7.15.2
+        container_name: kibana
+        ports:
+            - "5601:5601"
+        depends_on:
+            - elasticsearch
+        networks:
+            - drones
+        volumes:
+            - ./offline_maps/kibana.yml:/usr/share/kibana/config/kibana.yml
+
+    filebeat:
+        build:
+            context: ./filebeat
+        user: root
+        container_name: filebeat
+        networks:
+            - drones
+        depends_on:
+            - elasticsearch
+        env_file:
+            - ./filebeat/.env
+        volumes:
+            - ${LOG_FILE_PATH}:/usr/share/filebeat/app.log
+
+    maps:
+        image: maptiler/server:4.5.0
+        container_name: maptiler
+        ports:
+            - "3650:3650"
+        networks:
+            - drones
+        volumes:
+            - ./offline_maps/maptiles:/data/
+
+volumes:
+    rabbit:
+    python:
+    redis:
+
+networks:
+    drones:
