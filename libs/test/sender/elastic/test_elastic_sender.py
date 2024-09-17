@@ -1,5 +1,6 @@
-from conftest import mock_calls
 from sender.elastic.elastic_sender import ElasticSender
+
+from conftest import mock_calls
 
 
 def test_create_connection_success(mock_elastic, mock_env):

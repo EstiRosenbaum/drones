@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY ./ /app
 
+RUN pip install .
+
 RUN mkdir /usr/share/filebeat
 
 RUN touch /usr/share/filebeat/app.log
