@@ -1,48 +1,22 @@
-name: 🔖 release
+name: Create Release
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - 'v*'
 
 jobs:
-  update-release:
+  create_release:
     runs-on: ubuntu-latest
-
-    permissions:
-      issues: write
-      contents: write
-
     steps:
-      - name: 📂 Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: 📦️ Create ZIP Archive
-        run: zip -r ${{ github.event.repository.name }}.zip .
-
-      - name: ⬆️ Upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./${{ github.event.repository.name }}.zip
-          asset_name: ${{ github.event.repository.name }}.zip
-          asset_content_type: application/zip
-
-      - name: 📝 Update Release Notes
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.event.release.tag_name }}
-          release_name: "Release ${{ github.event.release.tag_name }}"
-          body: |
-            ## Release Notes
-            - Route to new window after run
-            - Download 2 files after validate
-            - Color special lines on files
-            - Add trigger points
-            - Add date input
-            - Add pilot interface with table
-            - Improve visibility
-            - Information on formats
+      - name: Create Release via API
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+          -d "{\"tag_name\":\"$TAG_NAME\", \"name\":\"Release $TAG_NAME\", \"body\":\"Release notes for $TAG_NAME\"}" \
+          "https://api.github.com/repos/$GITHUB_REPOSITORY/releases"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
