@@ -28,3 +28,18 @@ jobs:
           asset_path: ./${{ github.event.repository.name }}.zip
           asset_name: ${{ github.event.repository.name }}.zip
           asset_content_type: application/zip
+
+changelog:
+  categories:
+    - title: New Features 🎉
+      labels:
+        - enhancement
+      notes: |
+        - Route to new window after run
+        - Download 2 files after validate
+        - Color special lines on files
+        - Add trigger points
+        - Add date input
+        - Add pilot interface with table
+        - Improve visibility
+        - Information on formats
