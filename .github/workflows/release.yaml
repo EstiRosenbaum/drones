@@ -1,22 +1,33 @@
-name: Create Release
+name: 🔖 release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [created]
 
 jobs:
-  create_release:
+  update-release:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
 
-      - name: Create Release via API
-        run: |
-          TAG_NAME=${GITHUB_REF#refs/tags/}
-          curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
-          -d "{\"tag_name\":\"$TAG_NAME\", \"name\":\"Release $TAG_NAME\", \"body\":\"Release notes for $TAG_NAME\"}" \
-          "https://api.github.com/repos/$GITHUB_REPOSITORY/releases"
+    permissions:
+      issues: write
+      contents: write
+
+    steps:
+      - name: 📂 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦️ Create ZIP Archive
+        run: zip -r ${{ github.event.repository.name }}.zip .
+
+      - name: ⬆️ Upload-release-asset
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./${{ github.event.repository.name }}.zip
+          asset_name: ${{ github.event.repository.name }}.zip
+          asset_content_type: application/zip
+
+      - name: 📝 Update Release Description with Closed Issues and Assignees
+        run: bash github_scripts/find_closed_issues.sh ${{ secrets.GITHUB_TOKEN }} ${{ github.event.release.url }}
